@@ -1,0 +1,106 @@
+substitutions:
+  name: "air-kathybed"
+  friendly_name: "Air Quality Kathy Bedroom"
+  myid: airkathy
+  
+esphome:
+  name: $name
+  friendly_name: $friendly_name
+
+esp8266:
+  board: d1_mini
+
+# Enable logging
+logger:
+
+captive_portal:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  platform: esphome
+  password: "e578d77672fbd9ea5925c274c938d20b"
+
+wifi:
+  ssid: "As you wish"
+  password: "6037424348"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${friendly_name}
+    password: "PtDGHwj5zRa6"
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    update_interval: 60min
+
+# Text sensors with general information.
+text_sensor:
+  # Expose ESPHome version as sensor.
+  - platform: version
+    name: ${name} ESPHome Version
+  # Expose WiFi information as sensors.
+  - platform: wifi_info
+    ip_address:
+      name: ${name} IP
+    ssid:
+      name: ${name} SSID
+    bssid:
+      name: ${name} BSSID
+
+light:
+  - platform: status_led
+    name: "Switch state"
+    pin: GPIO2
+
+uart:
+  rx_pin: D2
+  baud_rate: 9600
+
+one_wire:
+  - platform: gpio
+    pin: GPIO0 
+
+#dallas:
+#  - pin: GPIO0
+#  #0xE93C01D607793E28
+#    update_interval: 30s
+    
+# Sensors with general information.
+sensor:
+  # Uptime sensor.
+  - platform: uptime
+    name: ${name} Uptime
+    update_interval: 5min
+
+  # WiFi Signal sensor.
+  - platform: wifi_signal
+    name: ${name} WiFi Signal
+    update_interval: 5min
+    id: airkathy2wifi
+
+  # air quality sensor
+  - platform: pm1006
+    pm_2_5:
+      name: ${name} 2.5µm
+
+  # temp
+  - platform: dallas_temp
+    address: 0xE93C01D607793E28
+    name: ${name} Temperature
+    update_interval: 30s
+    id: ${myid}temp
+    filters:
+      - calibrate_linear:
+          - 25.11 -> 21.83
+          - 22.78 -> 19.72
+          - 20.89 -> 17.89
+          - 18.78 -> 15.94
+    
+switch:
+  - platform: restart
+    name: ${friendly_name} Restart
+    
+

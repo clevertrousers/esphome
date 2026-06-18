@@ -1,0 +1,32 @@
+esphome:
+  name: lolin-s2-mini
+  friendly_name: Lolin-s2-mini
+
+esp32:
+  board: lolin_s2_mini
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "k7V2F0h/U7dkcZzc07BIo/2AT8sECEYWFVMqBgCApTI="
+
+ota:
+  - platform: esphome
+    password: "fb88a9127a529ae2ae7618077a0a9e89"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Lolin-S2-Mini Fallback Hotspot"
+    password: "UgbdhJRjH0zx"
+
+captive_portal:
+    

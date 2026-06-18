@@ -1,0 +1,109 @@
+substitutions:
+  name: air-office
+  friendly_name: "Air Quality Azura"
+  idname: airoffc
+  
+esphome:
+  name: $name
+  friendly_name: $friendly_name
+ 
+esp8266:
+  board: d1_mini
+
+# Enable logging
+logger:
+
+captive_portal:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  platform: esphome
+  password: "805578e54d2cb6ccdaa9500f58ef65e3"
+
+wifi:
+  ssid: "As you wish"
+  password: "6037424348"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${friendly_name} Hotspot
+    password: "FYWuVwBGoZhB"
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    update_interval: 60min
+
+# Text sensors with general information.
+text_sensor:
+  # Expose ESPHome version as sensor.
+  - platform: version
+    name: ${name} ESPHome Version
+  # Expose WiFi information as sensors.
+  - platform: wifi_info
+    ip_address:
+      name: ${name} IP
+    ssid:
+      name: ${name} SSID
+    bssid:
+      name: ${name} BSSID
+
+light:
+  - platform: status_led
+    name: "Switch state"
+    pin: GPIO2
+
+uart:
+  rx_pin: D2
+  baud_rate: 9600
+  
+one_wire:
+  - platform: gpio
+    pin: GPIO0
+  #0x7E3C01D607B60F28
+#    update_interval: 30s
+    id: ${idname}_dallas
+    
+# Sensors with general information.
+sensor:
+  # Uptime sensor.
+  - platform: uptime
+    name: ${name} Uptime
+    update_interval: 5min
+    id: ${idname}_uptime
+
+  # WiFi Signal sensor.
+  - platform: wifi_signal
+    name: ${name} WiFi Signal
+    update_interval: 5min
+    id: ${idname}_wifi
+
+  # air quality sensor
+  - platform: pm1006
+    pm_2_5:
+      name: ${name} 2.5µm
+
+  # temp
+  - platform: dallas_temp
+    address: 0x3D3C01D6074ADF28
+    update_interval: 30s
+    name: ${name} Temperature
+    id: ${idname}_temp
+    filters:
+#      - lambda: return ( ( ( ( x * 9 / 5 ) + 32 ) * 0.9384 ) - 0.2246 -32 ) * 5 / 9;
+      - calibrate_linear:
+          - 25.11 -> 21.83
+#          - 23.22 -> 20.56
+          - 22.78 -> 19.72
+#          - 22.39 -> 19.83
+#          - 21.11 -> 18.44
+          - 20.89 -> 17.89
+          - 18.78 -> 15.94
+    
+switch:
+  - platform: restart
+    name: ${friendly_name} Restart
+    id: ${idname}_restart
+    

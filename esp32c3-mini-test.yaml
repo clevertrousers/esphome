@@ -1,0 +1,32 @@
+esphome:
+  name: esp32c3-mini-test
+  friendly_name: esp32c3 Mini Test
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "A3Xe0DeOYbpifTRwulJRVb0xe0b6ICQQmtZQmZWS1ck="
+
+ota:
+  - platform: esphome
+    password: "9bd3142c53cdee88a2ec3845e463967e"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esp32C3-Mini-Test"
+    password: "DXkHUN6s3Wvz"
+
+captive_portal:
+    

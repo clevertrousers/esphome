@@ -1,0 +1,163 @@
+substitutions:
+  name: cleversmoke
+  friendly_name: "CleverSmoke"
+
+esphome:
+  name: ${name}
+  platform: ESP32
+  board: lolin_d32
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  platform: esphome
+  password: "12c25524012ea083d6e1a3e96392d18e"
+
+wifi:
+  ssid: "As you wish"
+  password: "6037424348"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${friendly_name} Hotspot
+    password: "3Im0UlUXPAqB"
+
+captive_portal:
+
+status_led:
+  pin: GPIO5
+
+text_sensor:
+  # Expose ESPHome version as sensor.
+  - platform: version
+    name: ${name} ESPHome Version
+  # Expose WiFi information as sensors.
+  - platform: wifi_info
+    ip_address:
+      name: ${name} IP
+    ssid:
+      name: ${name} SSID
+    bssid:
+      name: ${name} BSSID
+
+# Example configuration entry for ESP32
+i2c:
+  sda: SDA
+  scl: SCL
+  scan: true
+  id: bus_a
+#MCP9808 0x18
+
+#SPI
+spi:
+  clk_pin: GPIO18
+  miso_pin: MISO
+  mosi_pin: MOSI
+      
+# Sensors with general information.
+sensor:
+  # Uptime sensor.
+  - platform: uptime
+    name: ${name} Uptime
+    update_interval: 60s
+
+#NTC Meat
+  # - platform: ntc
+  #   sensor: m1res
+  #   name: ${name} Meat 1
+  #   calibration:
+  #     - 330kOhm -> 4.33°C
+  #     - 115kOhm -> 21.78°C
+  #     - 5300Ohm -> 95.1°C
+      
+  # - platform: resistance
+  #   id: m1res
+  #   sensor: m1adc
+  #   configuration: DOWNSTREAM
+  #   resistor: 100kOhm
+  #   name: ${name} meat1resist1b
+
+  # - platform: adc
+  #   id: m1adc
+  #   pin: GPIO32
+  #   attenuation: 11db
+  #   name: ${name} meatsrc1b
+  #   update_interval: 10s
+
+#K-Type Smoker
+  - platform: max31856
+    name: ${name} Smoker
+    icon: "mdi:grill"
+    cs_pin: GPIO27
+    update_interval: 10s
+    accuracy_decimals: 1
+
+#K-Type Meat 1
+  - platform: max31856
+    name: ${name} Meat 1
+    icon: "mdi:food-steak"
+    cs_pin: GPIO17
+    update_interval: 10s
+    accuracy_decimals: 1
+#    filters:
+#      - offset: -0.17
+#      - calibrate_linear:
+#         method: least_squares
+#         datapoints:
+#          # Map 0.0 (from sensor) to 1.0 (true value)
+#          - 37.8 -> 40
+#          - 42.8 -> 43.7
+#K-Type Meat 2
+  - platform: max31856
+    name: ${name} Meat 2
+    icon: "mdi:food-steak"
+    cs_pin: GPIO16
+    update_interval: 10s
+    accuracy_decimals: 1
+#    filters:
+#      - offset: -0.17
+#      - calibrate_linear:
+#         method: least_squares
+#         datapoints:
+#          # Map 0.0 (from sensor) to 1.0 (true value)
+#          - 40 -> 37.2
+#          - 42.8 -> 42.4
+
+#outdoor temp
+  - platform: mcp9808
+    name: ${name} Outdoor Temp
+    update_interval: 20s
+    address: 0x18
+    filters:
+      - sliding_window_moving_average:
+         window_size: 3
+         send_every: 3
+    
+# Batt voltage
+  - platform: adc
+    pin: _VBAT
+    attenuation: 11db
+    name: ${name} Battery
+    update_interval: 60s
+    filters:
+      - multiply: 1.861
+      - sliding_window_moving_average:
+         window_size: 3
+         send_every: 1
+
+  - platform: homeassistant
+    id: smoker_alert_low
+    entity_id: input_number.smoker_alert_low
+    internal: false
+    accuracy_decimals: 0
+
+  - platform: homeassistant
+    id: smoker_alert_high
+    entity_id: input_number.smoker_alert_high
+    internal: false
+    accuracy_decimals: 0
+  

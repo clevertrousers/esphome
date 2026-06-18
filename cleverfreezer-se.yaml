@@ -1,0 +1,61 @@
+substitutions:
+  name: cleverfreezer-se
+  friendly_name: "Upright Freezer"
+  idname: cleverfreezer-se
+  
+esphome:
+  name: $name
+  friendly_name: $friendly_name
+
+esp8266:
+  board: d1_mini 
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  platform: esphome
+  password: "9af6c481b44ef55d735a8a3832ff02ff"
+
+wifi:
+  ssid: "As you wish"
+  password: "6037424348"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Cleverfreezer-SE"
+    password: "PZKMTWjCb8V0"
+
+captive_portal:
+
+# Temp Sensor
+one_wire:
+  - platform: gpio
+    pin: GPIO04
+#dallas:
+#  - pin: GPIO04
+#    update_interval: 120s
+#0x623C01D60753B128
+
+sensor:
+  - platform: dallas_temp
+    address: 0x623C01D60753B128
+    name: $name
+    id: temp
+    update_interval: 120s
+    force_update: True
+    on_value_range:
+      - above: -7
+        then:
+          - logger.log: "$name temp too warm!!"
+      - below: -12
+        then:
+          - logger.log: "$name Temp OK"
+
+  # WiFi Signal sensor.
+  - platform: wifi_signal
+    name: "$name WiFi Signal"
+    update_interval: 5min

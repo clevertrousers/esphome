@@ -1,0 +1,117 @@
+substitutions:
+  name: cleverfan
+  friendly_name: "Clever Fan"
+  idname: cleverfan
+  
+esphome:
+  name: $name
+  friendly_name: $friendly_name
+
+esp8266:
+  board: d1_mini
+
+wifi:
+  ssid: "As you wish"
+  password: "6037424348"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Cleverfan Fallback Hotspot"
+    password: "FrfkfFcvIM7D"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  platform: esphome
+  password: "31270abe09eca12950e72f2f805d9156"
+
+status_led:
+  pin: 
+    number: GPIO2
+    inverted: True
+    # It needs an inversion (active low)
+
+output:
+  - platform: gpio
+    pin: GPIO14
+    id: temp_led
+  - platform: esp8266_pwm
+    pin: GPIO4
+    frequency: 100 Hz
+    id: pwm_output
+    min_power: 0.0
+    max_power: 1.0
+
+# Temp Sensor
+one_wire:
+  - platform: gpio
+    pin: GPIO05 
+
+#dallas:
+#  - pin: GPIO05
+#    update_interval: 15s
+  
+sensor:
+  - platform: dallas_temp
+    address: 0x583C01D607CF5628
+    name: "Xbox Cabinet"
+    update_interval: 15s
+    id: temp
+    on_value_range:
+      - above: 26.7
+        then:
+          - output.turn_on: temp_led
+      - below: 26.7
+        then:
+          - logger.log: "Temp <25 Fan OFF"
+          - output.turn_off: temp_led
+          - fan.turn_off: pwmfan
+      - above: 26.7
+        below: 29.4
+        then:
+          - logger.log: "Temp >80<85 Fan 4"
+          - fan.turn_on:
+              id: pwmfan
+              speed: 4
+      - above: 29.4
+        below: 32.2
+        then:
+          - logger.log: "Temp >85<90 Fan 6"
+          - fan.turn_on:
+              id: pwmfan
+              speed: 6
+      - above: 32.2
+        below: 35
+        then:
+          - logger.log: "Temp >90<95 Fan 8"
+          - fan.turn_on:
+              id: pwmfan
+              speed: 8
+      - above: 35
+        below: 37.8
+        then:
+          - logger.log: "Temp >95<100 Fan 9"
+          - fan.turn_on:
+              id: pwmfan
+              speed: 9
+      - above: 37.8
+        then:
+          - logger.log: "Temp >100 Fan 10"
+          - fan.turn_on:
+              id: pwmfan
+              speed: 10
+
+
+
+fan:
+  - platform: speed
+    output: pwm_output
+    name: "Xbox Fan"
+    id: pwmfan
+    speed_count: 10

@@ -1,0 +1,444 @@
+substitutions:
+  name: esptree
+  friendly_name: "Xmas Tree Lights"
+
+esp32:
+  board: lolin_d32
+  framework:
+    type: esp-idf
+    # Optional: You can specify a version if needed, 
+    # but 'recommended' is best for most users.
+    version: recommended
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "dW8yECAF52PJNfyLa6pdfmEovh1F7Otx+qpnMSrwMpw="
+
+captive_portal:
+
+ota:
+  platform: esphome
+  password: "226b2429e2a67d97a67fd6e6f040cace"
+
+wifi:
+  ssid: "As you wish"
+  password: "6037424348"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${friendly_name} Hotspot
+    password: "Fo5358xga6FD"
+    
+  # Sync time with Home Assistant.
+time:
+  - platform: homeassistant
+    id: ${name}_time
+    update_interval: 60min
+
+globals:
+  - id: display_on
+    type: bool
+    restore_value: no
+    initial_value: "true"
+
+script:
+  - id: display_timer
+    mode: restart
+    then:
+      - lambda: 'id(display_on) = true;'
+      - delay: 60s
+      - lambda: 'id(display_on) = false;'
+esphome:
+  name: $name
+
+# Text sensors with general information.
+text_sensor:
+  # Expose ESPHome version as sensor.
+  - platform: version
+    name: ${name} ESPHome Version
+  # Expose WiFi information as sensors.
+  - platform: wifi_info
+    ip_address:
+      name: ${name} IP
+    ssid:
+      name: ${name} SSID
+    bssid:
+      name: ${name} BSSID
+
+#light:
+#  - platform: status_led
+#    name: ${name} Status
+#    pin: GPIO5
+#    id: ${name}_stled
+
+light:
+  - platform: status_led
+    name: ${name} Status
+    pin: GPIO5
+    id: ${name}_stled
+
+
+
+  - platform: esp32_rmt_led_strip
+    rgb_order: RGB
+    pin: GPIO16
+    num_leds: 400
+    chipset: WS2811
+    name: "Tree WS2811"
+    id: ${name}_leds
+    on_state:
+      - script.execute: display_timer
+
+#- platform: neopixelbus
+#  type: RGB
+#  variant: WS2811
+#  pin: GPIO16
+#  num_leds: 400
+#  name: "Tree WS2811"
+#  id: ${name}_leds
+#  - platform: fastled_clockless
+#    chipset: WS2811
+#    pin: GPIO16
+#    num_leds: 50
+#    rgb_order: RGB
+#    name: "Tree WS2811"
+#    id: ${name}_leds
+    effects:
+      - addressable_rainbow:
+          name: Glowing Rainbow
+          speed: 5
+          width: 10
+      - addressable_random_twinkle:
+          name: Random Twinkle
+          twinkle_probability: 5%
+          progress_interval: 32ms
+      - addressable_fireworks:
+          name: Fireworks
+          update_interval: 32ms
+          spark_probability: 10%
+          use_random_color: false
+          fade_out_rate: 120
+      - addressable_flicker:
+          name: Flicker
+          update_interval: 16ms
+          intensity: 5%
+      - addressable_lambda:
+          name: "England"
+          lambda: |-
+            for (int i = 1; i <  it.size(); i+=2) {
+            it[i] = esphome::Color(255, 0, 18);
+            }
+            for (int i = 0; i <  it.size(); i+=2) {
+            it[i] = esphome::Color(223, 223, 233);
+            }
+      - addressable_lambda:
+          name: "Patriot"
+          lambda: |-
+            for (int i = 1; i <  it.size(); i+=3) {
+            it[i] = esphome::Color(255, 0, 18);
+            }
+            for (int i = 0; i <  it.size(); i+=3) {
+            it[i] = esphome::Color(207, 207, 207);
+            }
+            for (int i = 2; i <  it.size(); i+=3) {
+            it[i] = esphome::Color(18, 0, 255);
+            }
+      - addressable_lambda:
+          name: "Christmas Red-Green"
+          lambda: |-
+            for (int i = 1; i <  it.size(); i+=2) {
+            it[i] = esphome::Color(255, 0, 18);
+            }
+            for (int i = 0; i <  it.size(); i+=2) {
+            it[i] = esphome::Color(0, 179, 44);
+            }
+      - addressable_lambda:
+          name: "Christmas Multi"
+          lambda: |-
+            Color fairy[5]={Color(255,0,0),Color(50,205,50),Color(0,44,255),Color(255,20,147),Color(255,215,0)};
+            for (int i = 0; i <  it.size(); i+=1) {
+              it[i] = fairy[i % 5];
+            }
+      - addressable_lambda:
+          name: "Police"
+          update_interval: 15ms
+          lambda: |-
+            static int state = 0;
+            static int sz = it.size();
+            const int width = 100;
+            const int incr = 50;
+
+            if(initial_run == true)
+              it.range(0,sz)=Color(0,0,0);
+
+            int b1 = state;
+            int b2 = state + incr;
+            int p1 = state + incr;
+            int p2 = state + incr + width - 1;
+            
+            if(b2 < sz){
+              it.range(b1, b2)=Color(0,0,0);
+            } else {
+              it.range(b1,sz)=Color(0,0,0);
+              it.range(0,b2-sz)=Color(0,0,0);
+            }
+
+            if(p2 < sz ){
+              it.range(p1, p2)=Color(0,0,255);
+            } else {
+              it.range(p1, sz)=Color(0,0,255);
+              it.range(0,p2-sz)=Color(0,0,255);
+            }
+
+            state += incr;
+            if (state >= sz){
+              it.range(sz-incr,sz)=Color(0,0,0);
+              state = 0;         
+            }
+      - addressable_lambda:
+          name: Gold Glitter
+          update_interval: 18ms
+          lambda: |-
+            static int state = 0;
+
+            if (initial_run){
+              state = 0;
+
+              it.all() = Color(218,165,32);
+
+              ESP_LOGD("custom", "Gold Glitter");
+            } else {
+
+              it.all() = Color(218,165,32);
+
+              if(state==0){
+                int i = rand() % it.size();
+                it[i] = Color::WHITE;
+                state += 1;
+              } else {
+                state += 1;
+                state = state % 10;
+              }
+            }
+      - addressable_lambda:
+          name: "Trans"
+          lambda: |-
+            it.all() = Color(255,255,255);
+            for (int i = 0; i <  it.size()/5; i+=1) {
+            it[i] = esphome::Color(91, 206, 250);
+            }
+            for (int i = 1 + it.size()/5; i <  (it.size()/5) + it.size()/5; i+=1) {
+            it[i] = esphome::Color(245, 169, 184);
+            }
+            for (int i = it.size()/5*3; i <  (it.size()/5*3) + it.size()/5; i+=1) {
+            it[i] = esphome::Color(245, 169, 184);
+            }
+            for (int i = it.size() - it.size()/5 -1; i <  it.size(); i+=1) {
+            it[i] = esphome::Color(91, 206, 250);
+            }
+      - addressable_lambda:
+          name: "Trans Uniform" # Renamed for clarity
+          lambda: |-
+            // Define Colors
+            auto blue = esphome::Color(91, 206, 250);   // Light Blue
+            auto pink = esphome::Color(245, 169, 184);   // Pink
+            auto white = esphome::Color(255, 255, 255); // White
+            
+            const int num_leds = it.size(); // 400
+            const int stripe_len = num_leds / 5; // 80 LEDs per stripe
+             
+            it.range(0, stripe_len) = blue; 
+            
+            it.range(stripe_len, stripe_len) = pink;
+             
+            it.range(stripe_len * 2, stripe_len) = white;
+            
+            it.range(stripe_len * 3, stripe_len) = pink;
+             
+            it.range(stripe_len * 4, stripe_len) = blue;
+      
+      - addressable_lambda:
+          name: ScanMe
+          update_interval: 100ms
+          lambda: |-
+            static int state = 0;
+
+            if (initial_run){
+              state = 0;
+
+              it.all() = Color(0,0,0);
+
+              ESP_LOGD("custom", "ScanMe");
+            } else {
+            
+              it.all() = Color(0,0,0);
+              it[state] = Color(255,255,255);
+              state += 1;
+              if(state>=400){
+                state = 0;
+              }
+            }
+      - addressable_lambda:
+          name: "ScanMeCalibrated" 
+          update_interval: 100ms
+          lambda: |-
+            static int state = 0;
+            
+            if (initial_run){
+              state = 0;
+              it.all() = esphome::Color(0,0,0);
+            } else {
+              
+              // 1. Clear the previous frame
+              it.all() = esphome::Color(0,0,0);
+              
+              // 2. Set the color based on the index
+              if (state == 0) {
+                // LED 0: Red (Calibration reference)
+                it[state] = esphome::Color(255, 0, 0); 
+              } else if (state == 1) {
+                // LED 1: Green (Calibration reference)
+                it[state] = esphome::Color(0, 255, 0);
+              } else if (state == 2) {
+                // LED 2: Blue (Calibration reference)
+                it[state] = esphome::Color(0, 0, 255);
+              } else {
+                // LEDs 3-399: White (Standard mapping)
+                it[state] = esphome::Color(255, 255, 255);
+              }
+              
+              // 3. Move to the next LED
+              state += 1;
+              if(state >= 400){
+                state = 0;
+              }
+            }
+      - addressable_lambda:
+          name: "Christmas Twinkle"
+          update_interval: 30ms
+          lambda: |-
+            Color fairy[5] = {
+              Color(255,0,0),    // Red
+              Color(50,205,50),  // Green
+              Color(0,44,255),   // Blue
+              Color(255,20,147), // Pink
+              Color(255,215,0)   // Gold
+            };
+
+            // millis() provides a constantly increasing time value
+            float time = millis() / 1000.0f;
+
+            for (int i = 0; i < it.size(); i++) {
+              // We use a sine wave to create the pulsing "twinkle"
+              // Adding (i * 0.5f) offsets each LED so they don't pulse in unison
+              float pulse = sinf(time * 3.0f + (i * 0.5f));
+              
+              // Map -1.0 to 1.0 range into a 0.5 to 1.0 brightness multiplier
+              float multiplier = (pulse * 0.25f) + 0.75f;
+
+              Color c = fairy[i % 5];
+              it[i] = Color(c.red * multiplier, c.green * multiplier, c.blue * multiplier);
+            }
+            
+      - addressable_lambda:
+          name: "Multi Glitter"
+          update_interval: 18ms
+          lambda: |-
+            static int state = 0;
+            // Define the Christmas Multi palette
+            Color fairy[5] = {
+              Color(255,0,0),    // Red
+              Color(50,205,50),  // Green
+              Color(0,44,255),   // Blue
+              Color(255,20,147), // Pink
+              Color(255,215,0)   // Gold
+            };
+
+            // 1. Draw the base multi-color pattern every frame
+            for (int i = 0; i < it.size(); i++) {
+              it[i] = fairy[i % 5];
+            }
+
+            // 2. Add the "Glitter" spark
+            if (state == 0) {
+              int i = rand() % it.size();
+              it[i] = Color::WHITE; 
+              state += 1;
+            } else {
+              state += 1;
+              state = state % 10; // Adjust '10' to change glitter frequency
+            }
+# Sensors with general information.
+sensor:
+  # Uptime sensor.
+  - platform: uptime
+    name: ${name} Uptime
+    update_interval: 5min
+
+  # WiFi Signal sensor.
+  - platform: wifi_signal
+    name: ${name} WiFi Signal
+    update_interval: 5min
+
+switch:
+  - platform: restart
+    id: _restart
+    name: ${name} Restart
+
+i2c:
+  sda: GPIO21
+  scl: GPIO22
+  frequency: 800kHz
+    
+font:
+  - file: 'fonts/mdi.ttf'
+    id: mdifont
+    size: 12
+    glyphs: [
+      "󰳲", # mdi-brightness-percent
+      "󰃞", # mdi-brightness-5
+      "󰖨"  # mid-white-balance-sunny
+      ]
+  - file: 'fonts/BebasNeue-Regular.ttf'
+    id: font2
+    size: 18
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x32"
+    address: 0x3C
+    rotation: 180
+#    lambda: |-
+#      it.print(0, 0, id(font1), "Hello ESPHome!");
+#    lambda: |-
+#      int brt = int(id(${name}_leds).current_values.get_brightness() * 100);
+#      it.printf (0,1, id(mdifont), TextAlign::TOP_LEFT, "󰃞");
+#      it.printf(16, 0, id(font2), TextAlign::TOP_LEFT, "%d%%", brt );
+#      it.printf(0, 16, id(font2), TextAlign::TOP_LEFT, "%s", id(${name}_leds).get_effect_name().c_str() );
+#      it.print(0, 0, id(font2), TextAlign::TOP_LEFT, "%u", int(id(${name}_leds).remote_values.get_brightness() * 255));
+#       it.print(0, 0, id(font2), TextAlign::TOP_LEFT, id(${name}_leds).get_light().current_values.get_brightness());
+    lambda: |-
+      if (id(display_on)) {
+        // Pixel Shifting Logic: Moves the entire UI 1-2 pixels every few seconds
+        int offset_x = (millis() / 5000) % 2; 
+        int offset_y = (millis() / 10000) % 2;
+
+        // Calculate brightness
+        int brt = int(id(${name}_leds).current_values.get_brightness() * 100);
+        
+        // Print Brightness Icon and %
+        it.printf(0 + offset_x, 1 + offset_y, id(mdifont), TextAlign::TOP_LEFT, "󰃞");
+        it.printf(20 + offset_x, 0 + offset_y, id(font2), TextAlign::TOP_LEFT, "%d%%", brt);
+        
+        // Print Effect Name (Scrolls if too long)
+        std::string effect = id(${name}_leds).get_effect_name();
+        if (effect == "None") effect = "Static";
+        
+        it.printf(0 + offset_x, 16 + offset_y, id(font2), TextAlign::TOP_LEFT, "%s", effect.c_str());
+      } else {
+        it.fill(Color::BLACK); // Screen is "Off"
+      }

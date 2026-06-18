@@ -1,0 +1,90 @@
+substitutions:
+  name: cleverfreezer
+  friendly_name: "Chest Freezer"
+  idname: cleverfreezer
+  
+esphome:
+  name: $name
+  friendly_name: $friendly_name
+
+esp8266:
+  board: d1_mini 
+
+
+wifi:
+  ssid: "As you wish"
+  password: "6037424348"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "$name Fallback Hotspot"
+    password: "eEROYzbEWVSZ"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  platform: esphome
+  password: "31270abe09eca12950e72f2f805d9166"
+
+status_led:
+  pin: 
+    number: GPIO2
+    inverted: True
+    # It needs an inversion (active low)
+    
+output:
+  - platform: gpio
+    pin: GPIO14
+    id: "${name}_temp_led"
+  - platform: gpio
+    pin:
+      number: GPIO12
+      inverted: True
+    id: "${name}_door_led"
+    
+# Temp Sensor
+one_wire:
+  - platform: gpio
+    pin: GPIO04
+
+#dallas:
+#  - pin: GPIO04
+#    update_interval: 120s
+#0x743C01D60785F928
+
+sensor:
+  - platform: dallas_temp
+    address: 0x743C01D60785F928
+    name: ${name}_temp
+    id: temp
+    update_interval: 120s
+    on_value_range:
+      - above: -15
+        then:
+          - logger.log: "Freezer temp too warm!!"
+          - output.turn_on: "${name}_temp_led"
+      - below: -15
+        then:
+          - logger.log: "Freezer Temp OK"
+          - output.turn_off: "${name}_temp_led"
+
+    
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D7
+      mode: INPUT_PULLUP
+    name: "$name Door"
+    device_class: door
+    on_press:
+      then:
+        - output.turn_on: "${name}_door_led"
+    on_release:
+      then:
+        - output.turn_off: "${name}_door_led"

@@ -1,0 +1,72 @@
+esphome:
+  name: cleverweather
+  friendly_name: CleverWeather
+  # Set LED to green once on boot
+  on_boot:
+    priority: -100
+    then:
+      - light.turn_on:
+          id: onboard_rgb_led
+          red: 0%
+          green: 100%
+          blue: 0%
+          brightness: 25%      
+      - delay: 30s
+      - light.turn_off: onboard_rgb_led
+
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "Wgvmw6h5kqxSD47k2gwyO7jhSQ44bNp5PcX055RccMI="
+
+ota:
+  - platform: esphome
+    password: "9c90350ba101ce88dff685123a804861"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${friendly_name} Hotspot
+    password: "FR4ArE6xJ8J1"
+
+captive_portal:
+
+i2c:
+  sda: GPIO21
+  scl: GPIO20
+  scan: true
+  id: bus_a
+
+sensor:
+  - platform: sht4x
+    temperature:
+      name: ${friendly_name} Temperature
+    humidity:
+      name: ${friendly_name} Humidity
+
+# Define the onboard RGB LED (usually WS2812 on GPIO8)
+light:
+  - platform: neopixelbus
+    id: onboard_rgb_led
+    type: GRB
+    pin: GPIO8
+    num_leds: 1
+    variant: ws2812
+    name: ${friendly_name} LED
+    method:
+      type: esp32_rmt
+      channel: 0
+
+

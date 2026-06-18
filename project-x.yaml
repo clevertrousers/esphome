@@ -1,0 +1,93 @@
+substitutions:
+  name: project-x
+  friendly_name: "Air Quality Office"
+
+esphome:
+  name: $name
+  platform: ESP8266
+  board: d1_mini_pro
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "a2f817a3ed842e45ecdc89fb4e1ef5a4"
+
+captive_portal:
+
+wifi:
+  ssid: "As you wish"
+  password: "6037424348"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${friendly_name} Hotspot
+    password: "A3cBol6bAk8V"
+
+time:
+  - platform: homeassistant
+    id: esptime
+
+light:
+  - platform: status_led
+    name: "Switch state"
+    pin: GPIO2
+
+dallas:
+  - pin: GPIO0
+    update_interval: 30s
+    #0x5200000002722E28
+
+i2c:
+  sda: GPIO4
+  scl: GPIO5
+  
+sensor:
+  # Uptime sensor.
+  - platform: uptime
+    name: ${name} Uptime
+    update_interval: 5min
+
+  # WiFi Signal sensor.
+  - platform: wifi_signal
+    name: ${name} WiFi Signal
+    update_interval: 5min
+    
+  # temp
+  - platform: dallas
+    address: 0x5200000002722E28
+    name: ${name} Temperature
+    id: xtemp
+
+font:
+  - file: 'fonts/BebasNeue-Regular.ttf'
+    id: font1
+    size: 40
+  - file: 'fonts/BebasNeue-Regular.ttf'
+    id: font2
+    size: 24
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x32"
+    address: 0x3C
+    rotation: 180
+#    lambda: |-
+#      it.print(0, 0, id(font1), "Hello ESPHome!");
+    lambda: |-
+      if (id(xtemp).has_state()) {
+       it.printf(0, 0, id(font1), TextAlign::TOP_LEFT , "%.1f°F", (id(xtemp).state*9/5)+32);
+      }
+      it.strftime(127, 0, id(font2), TextAlign::TOP_RIGHT, "%H:%M", id(esptime).now());
+#      it.strftime(0, 30, id(font1), TextAlign::BASELINE_LEFT, "%H:%M", id(esptime).now());
+#      it.strftime(0, 8, id(font1), TextAlign::BASELINE_LEFT, "%H:%M  %d.%m.%Y", id(homeassistant_time).now());
+#      // Print time in HH:MM format
+#      // Print inside temperature (from homeassistant sensor)
+
+#      // Print outside temperature (from homeassistant sensor)
+#      if (id(outside_temperature).has_state()) {
+#        it.printf(127, 60, id(font3), TextAlign::BASELINE_RIGHT , "%.1f°", id(outside_temperature).state);
+#      }

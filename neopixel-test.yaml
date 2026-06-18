@@ -1,0 +1,138 @@
+substitutions:
+  name: neopixel-test
+  friendly_name: "Neopixel Test"
+  idname: neopixeltest
+  
+globals:
+    # This variable stores the current mode chosen by pressing the buttons (physical or digital)
+  - id: ${idname}v1l
+    type: int
+    restore_value: no
+    initial_value: "0"
+
+esphome:
+  name: ${name}
+
+esp8266:
+  board: d1_mini
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "bM+JxOJCpySxBOcFQgj5SMLXHCz4vebOJohIbjC6ZQg="
+
+ota:
+  password: "7308d981b25bae0676b593bf350f0790"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Neopixel-Test Fallback Hotspot"
+    password: "6JGt5I8nUWYq"
+
+captive_portal:
+
+number:
+  - platform: template
+    name: ${friendly_name} V1
+    id: "${idname}v1"
+    icon: "mdi:speedometer"
+    step: 1
+    min_value: 0
+    max_value: 10
+    mode: slider
+    set_action:
+      then:
+        - lambda:  id(${idname}v1l) = (int)x;
+light:
+  - platform: status_led
+    name: "${friendly_name} Status"
+    pin: GPIO2
+  - platform: neopixelbus
+
+    type: GRBW
+    variant: WS2812
+    pin: GPIO5
+    num_leds: 16
+    name: "${friendly_name} LEDs"
+    effects:
+      # Customize parameters
+      - random:
+          name: "Slow Random"
+          transition_length: 30s
+          update_interval: 30s
+      - random:
+          name: "Fast Random"
+          transition_length: 4s
+          update_interval: 5s
+      - addressable_rainbow:
+          name: Rainbow
+          speed: 10
+          width: 8
+      - addressable_twinkle:
+          name: Twinkle Effect
+          twinkle_probability: 5%
+          progress_interval: 4ms
+      - addressable_random_twinkle:
+          name: Random Twinkle
+          twinkle_probability: 5%
+          progress_interval: 32ms
+      - addressable_fireworks:
+          name: Fireworks
+          update_interval: 32ms
+          spark_probability: 10%
+          use_random_color: false
+          fade_out_rate: 120
+      - addressable_flicker:
+          name: Flicker
+      - pulse:
+      - pulse:
+          name: "Fast Pulse"
+          transition_length: 0.5s
+          update_interval: 0.5s
+      - pulse:
+          name: "Slow Pulse"
+          # transition_length: 1s      # defaults to 1s
+          update_interval: 2s
+      - addressable_lambda:
+          name: "Police"
+          update_interval: 10ms
+          lambda: |-
+            static int state = 0;
+            static int sz = it.size();
+            const int width = 8;
+            const int incr = 1;
+
+            if(initial_run == true)
+              it.range(0,sz)=ESPColor(0,0,0);
+
+            int b1 = state;
+            int b2 = state + incr;
+            int p1 = state + incr;
+            int p2 = state + incr + id(${idname}v1l) - 1;
+            
+            if(b2 < sz){
+              it.range(b1, b2)=ESPColor(0,0,0);
+            } else {
+              it.range(b1,sz)=ESPColor(0,0,0);
+              it.range(0,b2-sz)=ESPColor(0,0,0);
+            }
+
+            if(p2 < sz ){
+              it.range(p1, p2)=ESPColor(0,0,255);
+            } else {
+              it.range(p1, sz)=ESPColor(0,0,255);
+              it.range(0,p2-sz)=ESPColor(0,0,255);
+            }
+      
+            state += incr;
+            if (state >= sz){
+              it.range(sz-incr,sz)=ESPColor(0,0,0);
+              state = 0;         
+            }

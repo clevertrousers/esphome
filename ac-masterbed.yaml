@@ -1,0 +1,92 @@
+
+substitutions:
+  name: ac-masterbed
+  friendly_name: "Master Bed A/C"
+
+esphome:
+  name: $name
+  friendly_name: $friendly_name
+
+esp8266:
+  board: d1_mini
+
+
+# The echavet component REQUIRES a defined UART bus
+# For D1 Mini, hardware UART uses GPIO1 (TX) and GPIO3 (RX)
+uart:
+  id: HP_UART
+  baud_rate: 2400
+  tx_pin: GPIO1
+  rx_pin: GPIO3
+
+# Disable serial logging to avoid interference with the UART pins
+logger:
+  baud_rate: 0
+
+# Enable Home Assistant API
+api:
+
+captive_portal:
+
+ota:
+  platform: esphome
+  password: "31270abe09eca12950e72f2f805d9153"
+
+wifi:
+  ssid: "As you wish"
+  password: "6037424348"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${friendly_name} Fallback Hotspot
+    password: "4BOwMfONSnHG"
+    
+  # Sync time with Home Assistant.
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    update_interval: 60min
+
+# Text sensors with general information.
+text_sensor:
+  # Expose ESPHome version as sensor.
+  - platform: version
+    name: ${name} ESPHome Version
+  # Expose WiFi information as sensors.
+  - platform: wifi_info
+    ip_address:
+      name: ${name} IP
+    ssid:
+      name: ${name} SSID
+    bssid:
+      name: ${name} BSSID
+
+light:
+  - platform: status_led
+    name: "Switch state"
+    pin: GPIO2
+
+# Sensors with general information.
+sensor:
+  # Uptime sensor.
+  - platform: uptime
+    name: ${name} Uptime
+    update_interval: 5min
+
+  # WiFi Signal sensor.
+  - platform: wifi_signal
+    name: ${name} WiFi Signal
+    update_interval: 5min
+
+external_components:
+  - source: github://echavet/MitsubishiCN105ESPHome
+
+climate:
+  - platform: cn105  # Corrected platform name
+    name: ${friendly_name}
+    uart_id: HP_UART
+    update_interval: 2s # Recommended for this component
+    
+switch:
+  - platform: restart
+    name: ${friendly_name} Restart
