@@ -23,6 +23,7 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
+  fast_connect: true
   ap:
     ssid: esp32c3minitest Fallback Hotspot
     password: "Ke1fOvs7MGGm"
