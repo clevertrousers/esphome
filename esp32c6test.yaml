@@ -41,3 +41,13 @@ text_sensor:
     name: "Latest Detected BLE MAC"
     id: latest_ble_mac
     icon: "mdi:bluetooth"
+
+light:
+  - platform: monochromatic
+    name: "${friendly_name} Built-in LED"
+    output: ${name}_led_output
+
+output:
+  - platform: ledc
+    pin: GPIO15
+    id: ${name}_led_output
