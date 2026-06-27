@@ -6,10 +6,11 @@ esphome:
   friendly_name: esp32c6test
 
 esp32:
+  board: seeed_xiao_esp32c6
   variant: esp32c6
-  flash_size: 4MB
   framework:
     type: esp-idf
+    version: latest
 
 logger:
 
