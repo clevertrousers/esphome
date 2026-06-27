@@ -29,3 +29,15 @@ wifi:
     password: "h9iOOpl5rtQu"
 
 captive_portal:
+
+esp32_ble_tracker:
+  on_ble_advertise:
+    - then:
+        - lambda: |-
+            id(latest_ble_mac).publish_state(x.get_address_str());
+
+text_sensor:
+  - platform: template
+    name: "Latest Detected BLE MAC"
+    id: latest_ble_mac
+    icon: "mdi:bluetooth"
