@@ -36,10 +36,11 @@ captive_portal:
   # Configure the GPIO pin as a PWM output for dimming capability
 output:
   - platform: ledc
-    pin: GPIO8
+    pin:
+      number: GPIO8
+      inverted: true  
     id: gpio8_led_output
-    inverted: true
-
+    
 # Expose the output as a switchable light in Home Assistant
 light:
   - platform: monochromatic
