@@ -49,5 +49,7 @@ light:
 
 output:
   - platform: ledc
-    pin: GPIO15
+    pin:
+      number: GPIO15
+      inverted: true  
     id: led_output
