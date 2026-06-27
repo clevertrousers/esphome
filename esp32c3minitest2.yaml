@@ -32,3 +32,15 @@ wifi:
     password: "Ke1fOvs7MGGm"
 
 captive_portal:
+
+  # Configure the GPIO pin as a PWM output for dimming capability
+output:
+  - platform: ledc
+    pin: GPIO8
+    id: $[name]gpio8_led_output
+
+# Expose the output as a switchable light in Home Assistant
+light:
+  - platform: monochromatic
+    name: "ESP32C3 Onboard LED"
+    output: gpio8_led_output
