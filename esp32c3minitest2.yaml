@@ -38,6 +38,7 @@ output:
   - platform: ledc
     pin: GPIO8
     id: gpio8_led_output
+    inverted: true
 
 # Expose the output as a switchable light in Home Assistant
 light:
