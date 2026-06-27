@@ -37,7 +37,7 @@ captive_portal:
 output:
   - platform: ledc
     pin: GPIO8
-    id: $[name]gpio8_led_output
+    id: gpio8_led_output
 
 # Expose the output as a switchable light in Home Assistant
 light:
