@@ -1,9 +1,12 @@
 # Board: Espressif ESP32-C6-DevKitM-1 (Espressif)
 # Definition: definitions/boards/esp32-c6-devkitm-1/manifest.yaml
+substitutions:
+  name: "esp32c6test"
+  friendly_name: "Seed Studio esp32c6"
 
 esphome:
-  name: esp32c6test
-  friendly_name: esp32c6test
+  name: ${name}
+  friendly_name: ${name}
 
 esp32:
   board: seeed_xiao_esp32c6
@@ -44,7 +47,7 @@ text_sensor:
 
 light:
   - platform: monochromatic
-    name: ${name} Built-in LED
+    name: "${name} Built-in LED"
     output: led_output
 
 output:
