@@ -1,5 +1,5 @@
 # Board: Espressif ESP32-C6-DevKitM-1 (Espressif)
-# Definition: definitions/boards/esp32-c6-devkitm-1/manifest.yaml
+
 substitutions:
   name: "esp32c6test"
   friendly_name: "Seed Studio esp32c6"
@@ -23,6 +23,7 @@ api:
 
 ota:
   - platform: esphome
+    password: Batmanisawesome!0
 
 wifi:
   ssid: !secret wifi_ssid
