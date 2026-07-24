@@ -2,8 +2,8 @@
 # Definition: definitions/boards/esp32-c3-devkitm-1/manifest.yaml
 
 esphome:
-  name: esp32c3test3
-  friendly_name: esp32c3test3
+  name: esp32c3minitest3
+  friendly_name: esp32c3minitest3
 
 esp32:
   variant: esp32c3
