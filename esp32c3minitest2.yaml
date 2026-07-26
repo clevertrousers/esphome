@@ -28,7 +28,7 @@ wifi:
   output_power: 8.5dBm
   
   ap:
-    ssid: esp32c3minitest Fallback Hotspot
+    ssid: esp32c3minitst2 Fallback Hotspot
     password: "Ke1fOvs7MGGm"
 
 captive_portal:
