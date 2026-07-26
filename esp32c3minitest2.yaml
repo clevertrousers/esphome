@@ -49,7 +49,7 @@ light:
 
 uart:
   id: uart_ld2410
-  tx_pin: GPIO5
+  tx_pin: GPIO3
   rx_pin: GPIO4
   baud_rate: 256000
   parity: NONE
