@@ -25,6 +25,8 @@ logger:
 
 # Enable Home Assistant API
 api:
+  encryption:
+    key: !secret ac_encryption_key
 
 captive_portal:
 
