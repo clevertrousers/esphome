@@ -1,7 +1,7 @@
 substitutions:
   name: ac-livingrm
   friendly_name: "Living Room A/C"
-  foo4: "hello world"
+  foo5: "hello world"
 
 esphome:
   name: $name
