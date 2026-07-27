@@ -22,6 +22,8 @@ logger:
   baud_rate: 0
 
 api:
+  encryption:
+    key: !secret ac_library__encryption_key
 
 captive_portal:
 
