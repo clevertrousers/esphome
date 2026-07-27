@@ -16,6 +16,8 @@ captive_portal:
 
 # Enable Home Assistant API
 api:
+  encryption:
+    key: !secret ac_encryption_key
 
 ota:
   platform: esphome
