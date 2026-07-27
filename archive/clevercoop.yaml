@@ -1,0 +1,84 @@
+substitutions:
+  name: clevercoop
+  friendly_name: "Clever Coop"
+
+esphome:
+  name: ${name}
+  on_boot:
+    then:
+      - wait_until:
+          api.connected:
+      - script.execute: consider_deep_sleep
+esp8266:
+  board: d1_mini_pro
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "e33fed2a5d5172efa8d609a3b685a4fd"
+
+wifi:
+  ssid: "As you wish"
+  password: "6037424348"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${friendly_name} Hotspot
+    password: "FRZzryKkTOC6"
+
+captive_portal:
+
+text_sensor:
+sensor:
+  # Uptime sensor.
+  - platform: uptime
+    name: ${name} Uptime
+    update_interval: 5min
+
+  # WiFi Signal sensor.
+  - platform: wifi_signal
+    name: ${name} WiFi Signal
+    update_interval: 5min
+    id: airoffcwifi
+
+# Batt voltage
+  - platform: adc
+    pin: A0
+    name: ${friendly_name} Battery
+    update_interval: 5s
+    force_update: true
+#    filters:
+#      - multiply: 13.6
+      
+## Deep Sleep
+
+deep_sleep:
+  id: deep_sleep_control
+  sleep_duration: 30s
+      
+       
+# Will only pick up a value if this device is configured in Home Assistant > Integrations
+# If the device isn't configured, or Home Assistant is offline, it'll default to false
+binary_sensor:
+  - platform: homeassistant
+    id: prevent_deep_sleep
+    entity_id: input_boolean.prevent_deep_sleep
+
+script:
+  - id: consider_deep_sleep
+    mode: queued
+    then:
+      - delay: 30s
+      - if:
+          condition:
+            binary_sensor.is_on: prevent_deep_sleep
+          then:
+            - logger.log: 'prevent_deep_sleep is *ON*'
+          else:
+            - logger.log: 'prevent_deep_sleep is OFF'
+            - deep_sleep.enter: deep_sleep_control
+      - script.execute: consider_deep_sleep 

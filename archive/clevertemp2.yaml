@@ -1,0 +1,105 @@
+esphome:
+  name: clevertemp
+  platform: ESP8266
+  board: d1_mini
+  on_boot:
+    then:
+      - wait_until:
+          api.connected:
+      - script.execute: consider_deep_sleep
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "ArQHVhNnXWwSQM/gZ436vi7yfOJ9fFmCyIGK3qDUfLq="
+    
+ota:
+  password: "74583e079be409851f192c80b0e5f98b"
+
+wifi:
+  ssid: "As you wish"
+  password: "6037424348"
+  fast_connect: true
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Clevertemp Fallback Hotspot"
+    password: "gJdTS1dLKQLM"
+
+captive_portal:
+
+
+# mqtt:
+#   broker: '192.168.86.31'
+#   username: 'mqtt'
+#   password: 'mqtt'
+#   discovery: False
+#   discovery_retain: False
+
+# Temp Sensor
+dallas:
+  - pin: GPIO04
+    update_interval: 5s
+#0x233C01D607849A28
+
+sensor:
+
+  - platform: wifi_signal
+    name: "Clevertemp WiFi"
+    update_interval: 5s
+    force_update: true
+
+# Uptime sensor.
+  - platform: uptime
+    name: "Clevertemp Uptime"
+    update_interval: 5min    
+
+# temp
+  - platform: dallas
+    address: 0x233C01D607849A28
+    name: "Clevertemp Temperature"
+    id: temp
+    force_update: true
+
+# Batt voltage
+  - platform: adc
+    pin: A0
+    name: "Clevertemp Battery"
+    update_interval: 5s
+    force_update: true
+    filters:
+      - multiply: 13.6
+      
+## Deep Sleep
+
+deep_sleep:
+  id: clvtemp_deep_sleep_ctl
+  sleep_duration: 585s
+      
+       
+# Will only pick up a value if this device is configured in Home Assistant > Integrations
+# If the device isn't configured, or Home Assistant is offline, it'll default to false
+binary_sensor:
+  - platform: homeassistant
+    id: clvtemp_prevent_sleep
+    entity_id: input_boolean.prevent_deep_sleep
+
+script:
+  - id: consider_deep_sleep
+    mode: queued
+    then:
+      - delay: 15s
+      - if:
+          condition:
+            binary_sensor.is_on: clvtemp_deep_sleep_ctl
+          then:
+            - logger.log: 'prevent_deep_sleep is *ON*'
+          else:
+            - logger.log: 'prevent_deep_sleep is OFF'
+            - deep_sleep.enter: deep_sleep_control
+      - script.execute: consider_deep_sleep 
+
+    

@@ -1,0 +1,60 @@
+esphome:
+  name: cleversmoke-display
+  platform: ESP32
+  board: esp32dev
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "9896535cbc33890443585f3162ecacd5"
+
+wifi:
+  ssid: "As you wish"
+  password: "6037424348"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Smoker-Display Hotspot"
+    password: "H8q1wk9SYUKZ"
+
+captive_portal:
+
+
+sensor:   
+  - platform: homeassistant
+    id: t_smoker
+    entity_id: sensor.cleversmoke_smoker
+    
+  # Uptime sensor.
+  - platform: uptime
+    name: Uptime
+    id: t_uptime
+    internal: True
+    update_interval: 10sec
+    
+font:
+  - file: 'fonts/ComicSansMSRegular.ttf'
+    id: font1
+    size: 48
+
+spi:
+  clk_pin: GPIO14
+  mosi_pin: GPIO13
+  
+display:
+  - platform: waveshare_epaper
+    cs_pin: GPIO32
+    dc_pin: GPIO33
+    reset_pin: GPIO25
+    busy_pin: GPIO26
+    model: 4.20in
+    update_interval: 10s
+    id: bob
+    lambda: |-
+      it.printf(0, 0, id(font1), "Hello World2!");
+      it.printf(0, 50, id(font1), TextAlign::TOP_LEFT , "Temp: %.1f°F", id(t_smoker).state);
+      it.printf(0, 100, id(font1), TextAlign::TOP_LEFT , "Uptime: %.0fs", id(t_uptime).state);

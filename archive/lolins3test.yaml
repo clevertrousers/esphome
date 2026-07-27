@@ -1,0 +1,65 @@
+# https://www.wemos.cc/en/latest/s3/s3_mini.html
+
+
+substitutions:
+  friendly_name: "Lolin S3 Test"
+  device_name: 'lolins3test'
+  project_base: 'Wemos'
+  project_name: 'ESP32'
+  project_version: 'S3 mini'
+  device_description: 'Lolin Wemos ESP32-S3 mini'
+
+esphome:
+  name: $device_name
+  friendly_name: $friendly_name
+  comment: $device_description
+  project:
+    name: ${project_base}.${project_name}
+    version: $project_version
+  platformio_options:
+    platform: https://github.com/platformio/platform-espressif32.git
+    board: lolin_s3_mini
+    framework: arduino
+    platform_packages:
+      - framework-arduinoespressif32 @ https://github.com/espressif/arduino-esp32
+
+esp32:
+  variant: esp32s3
+  board: lolin_s3_mini
+  framework:
+    type: arduino
+    version: latest    
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "6037424348"
+
+ota:
+  platform: esphome
+  password: "6037424348"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  #power_save_mode: none
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "${name} Fallback Hotspot"
+    password: "6037424348"
+
+captive_portal:
+
+sensor:
+  # Uptime sensor.
+  - platform: uptime
+    name: "${name} Uptime"
+    update_interval: 1min
+
+  # WiFi Signal sensor.
+  - platform: wifi_signal
+    name: "${name} WiFi Signal"
+    update_interval: 5min

@@ -1,0 +1,32 @@
+esphome:
+  name: lolins3minitest1
+  friendly_name: lolinS3minitest1
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "/4BisRwq8vdq4XVIq9Iw+lslRJX5r1QFt+fWdxQ/sWc="
+
+ota:
+  - platform: esphome
+    password: "b5d445557038a19b572e05f0b68bc5e8"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Lolins3Minitest1"
+    password: "HxvDPg7JydIi"
+
+captive_portal:
+    
