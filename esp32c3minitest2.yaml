@@ -3,7 +3,7 @@
 
 esphome:
   name: esp32c3minitest2
-  friendly_name: esp32c3minitest2
+  friendly_name: Presence Detector
 
 esp32:
   variant: esp32c3
