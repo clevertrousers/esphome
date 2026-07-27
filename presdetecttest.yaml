@@ -1,0 +1,120 @@
+# Board: ESP32-C3 DevKitM-1 (Espressif)
+# Definition: definitions/boards/esp32-c3-devkitm-1/manifest.yaml
+
+esphome:
+  name: presdetecttest
+  friendly_name: Presence Detector
+
+esp32:
+  variant: esp32c3
+  flash_size: 4MB
+  framework:
+    type: esp-idf
+
+logger:
+
+api:
+  encryption:
+    key: "sCmXIDuthv9eBu/S4nplUVk2mnvjhKPdLpW+PPeyHBI="
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
+  power_save_mode: NONE
+  output_power: 8.5dBm
+  
+  ap:
+    ssid: esp32c3minitst2 Fallback Hotspot
+    password: "Ke1fOvs7MGGm"
+
+captive_portal:
+
+  # Configure the GPIO pin as a PWM output for dimming capability
+output:
+  - platform: ledc
+    pin:
+      number: GPIO8
+      inverted: true  
+    id: gpio8_led_output
+    
+# Expose the output as a switchable light in Home Assistant
+light:
+  - platform: monochromatic
+    name: "ESP32C3 Onboard LED"
+    output: gpio8_led_output
+
+uart:
+  id: uart_ld2410
+  tx_pin: GPIO3
+  rx_pin: GPIO4
+  baud_rate: 256000
+  parity: NONE
+  stop_bits: 1
+
+# LD2410 Component Definition
+ld2410:
+  id: my_ld2410
+  uart_id: uart_ld2410
+
+# -----------------------------------------------------------
+# 1. PRESENCE DETECTION (Binary Sensors)
+# -----------------------------------------------------------
+binary_sensor:
+  - platform: ld2410
+    has_target:
+      name: "Presence Detected"
+      device_class: occupancy
+    has_moving_target:
+      name: "Moving Target Detected"
+      device_class: motion
+    has_still_target:
+      name: "Still Target Detected"
+      device_class: occupancy
+
+# -----------------------------------------------------------
+# 2. RANGE & DISTANCE METRICS (Sensors)
+# -----------------------------------------------------------
+sensor:
+  - platform: ld2410
+    detection_distance:
+      name: "Target Distance"
+      unit_of_measurement: "cm"
+      icon: "mdi:ruler"
+    moving_distance:
+      name: "Moving Target Distance"
+      unit_of_measurement: "cm"
+      icon: "mdi:walk"
+    still_distance:
+      name: "Still Target Distance"
+      unit_of_measurement: "cm"
+      icon: "mdi:human-handsdown"
+    moving_energy:
+      name: "Moving Target Energy"
+      icon: "mdi:signal-distance-variant"
+    still_energy:
+      name: "Still Target Energy"
+      icon: "mdi:signal-variant"
+
+# -----------------------------------------------------------
+# 3. CONTROL SWITCHES & NUMBERS (Tuning Controls)
+# -----------------------------------------------------------
+number:
+  - platform: ld2410
+    timeout:
+      name: "Presence Off Delay"
+      unit_of_measurement: "s"
+    max_move_distance_gate:
+      name: "Max Moving Distance Gate"
+    max_still_distance_gate:
+      name: "Max Still Distance Gate"
+
+switch:
+  - platform: ld2410
+    engineering_mode:
+      name: "Engineering Mode"
+    bluetooth:
+      name: "Radar Bluetooth"
