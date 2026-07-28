@@ -14,6 +14,8 @@ logger:
 
 # Enable Home Assistant API
 api:
+  encryption:
+    key: !secret livingroomprez__encryption_key
 
 # Allow Over-The-Air updates
 ota:
