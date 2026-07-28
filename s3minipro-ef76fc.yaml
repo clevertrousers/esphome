@@ -139,7 +139,7 @@ binary_sensor:
 sensor:
   - platform: homeassistant
     name: "Current Temperature"
-    entity_id: "sensor.home_temperature"
+    entity_id: "sensor.kpsm_temperature"
     id: current_temperature
 
 i2c:
@@ -197,7 +197,6 @@ display:
 remote_receiver:
 - id: ${device_name}_receiver
   dump: all
-  rmt_channel: 7
   pin:
     number: $pin_ir
     mode:
@@ -249,7 +248,6 @@ light:
             id(${device_name}_leds).turn_on().set_brightness(0.2).set_rgb(1.0, 0.5, 0.0).perform();
 
   - platform: esp32_rmt_led_strip
-    rmt_channel: 3
     chipset: WS2812
     rgb_order: RGB
     pin: $pin_rgb_led
