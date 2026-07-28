@@ -27,6 +27,8 @@ logger:
 
 # Enable Home Assistant API
 api:
+  encryption:
+    key: !secret cleverfreezer__encryption_key
 
 ota:
   platform: esphome
