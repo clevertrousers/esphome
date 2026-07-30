@@ -1,13 +1,18 @@
 # Board: WEMOS LOLIN S3 Mini Pro
 # Definition: definitions/boards/lolin_s3_mini_pro/manifest.yaml
-
+substitutions:
+  node_name: lolin-s3-mini-pro-radar
+  node_friendly_name: Vehicle Speed Radar
 esphome:
-  name: lolin-s3-mini-pro-radar
-  friendly_name: lolin-s3-mini-pro-radar
+  name: ${node_name}
+  friendly_name: ${node_friendly_name}
 
 esp32:
+  board: esp32-s3-devkitc-1
   variant: esp32s3
-
+  framework:
+    type: esp-idf
+    
 logger:
 
 api:
