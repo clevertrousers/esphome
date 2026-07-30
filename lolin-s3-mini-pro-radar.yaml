@@ -32,3 +32,177 @@ wifi:
     password: "sfzD4RJfxfwh"
 
 captive_portal:
+
+# GPIO Outputs for Power Rails & Backlight
+output:
+  - platform: gpio
+    pin: GPIO33
+    id: display_backlight
+
+  - platform: gpio
+    pin: GPIO7
+    id: neopixel_power
+
+# Onboard WS2812B RGB Light Configuration
+light:
+  - platform: esp32_rmt_led_strip
+    pin: GPIO8
+    num_leds: 1
+    chipset: ws2812
+    rgb_order: GRB
+    id: onboard_rgb
+    name: "Onboard RGB Light"
+
+# Onboard Hardware Buttons (RGB matches button border ring)
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Left Button"
+    on_press:
+      then:
+        - light.turn_on:
+            id: onboard_rgb
+            brightness: 100%
+            red: 100%
+            green: 0%
+            blue: 0%
+    on_release:
+      then:
+        - light.turn_off: onboard_rgb
+
+  - platform: gpio
+    pin:
+      number: GPIO47
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Center Button"
+    on_press:
+      then:
+        - light.turn_on:
+            id: onboard_rgb
+            brightness: 100%
+            red: 0%
+            green: 100%
+            blue: 0%
+    on_release:
+      then:
+        - light.turn_off: onboard_rgb
+
+  - platform: gpio
+    pin:
+      number: GPIO48
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Right Button"
+    on_press:
+      then:
+        - light.turn_on:
+            id: onboard_rgb
+            brightness: 100%
+            red: 0%
+            green: 0%
+            blue: 100%
+    on_release:
+      then:
+        - light.turn_off: onboard_rgb
+
+# SPI Bus for onboard TFT screen
+spi:
+  clk_pin: GPIO12
+  mosi_pin: GPIO11
+
+# Hardware UART for LD2451 (Wiring: LD2451 TX -> GPIO44, LD2451 RX -> GPIO43)
+uart:
+  - id: ld2451_uart
+    tx_pin: GPIO43
+    rx_pin: GPIO44
+    baud_rate: 115200
+
+# Template Sensors for Radar Data
+sensor:
+  - platform: template
+    name: "Vehicle Speed (mph)"
+    id: vehicle_speed_mph
+    unit_of_measurement: "mph"
+    accuracy_decimals: 0
+    icon: "mdi:speedometer"
+
+  - platform: template
+    name: "Vehicle Distance"
+    id: vehicle_distance
+    unit_of_measurement: "m"
+    accuracy_decimals: 1
+    icon: "mdi:ruler"
+
+# LD2451 UART Frame Parser
+interval:
+  - interval: 100ms
+    then:
+      - lambda: |-
+          while (id(ld2451_uart).available() >= 16) {
+            uint8_t header[4];
+            id(ld2451_uart).read_array(header, 4);
+
+            // Match LD2451 frame header (0xAA 0xFF)
+            if (header[0] == 0xAA && header[1] == 0xFF) {
+              uint8_t buffer[12];
+              id(ld2451_uart).read_array(buffer, 12);
+
+              int16_t raw_speed = (int16_t)(buffer[6] | (buffer[7] << 8));
+              uint16_t raw_distance = (uint16_t)(buffer[4] | (buffer[5] << 8));
+
+              // Convert m/s raw output to mph (1 m/s = ~2.23694 mph)
+              float speed_ms = abs(raw_speed) / 10.0f;
+              float speed_mph = speed_ms * 2.23694f;
+              float distance_m = raw_distance / 100.0f;
+
+              if (speed_mph >= 1.0f) {
+                id(vehicle_speed_mph).publish_state(speed_mph);
+                id(vehicle_distance).publish_state(distance_m);
+              } else {
+                id(vehicle_speed_mph).publish_state(0.0f);
+              }
+            }
+          }
+
+# Font Definitions for 128x128 screen
+font:
+  - file: "gfonts://Roboto"
+    id: font_speed
+    size: 44
+  - file: "gfonts://Roboto"
+    id: font_unit
+    size: 16
+
+# Onboard ST7789 Display Component
+display:
+  - platform: ili9xxx
+    model: st7789v
+    id: onboard_display
+    dimensions:
+      height: 128
+      width: 128
+      offset_height: 1
+      offset_width: 2
+    cs_pin: GPIO35
+    dc_pin: GPIO36
+    reset_pin: GPIO34
+    invert_colors: true
+    transform:
+      mirror_x: true
+      mirror_y: true
+    data_rate: 40MHz
+    lambda: |-
+      float spd = id(vehicle_speed_mph).state;
+      if (std::isnan(spd)) {
+        spd = 0.0f;
+      }
+      
+      // Render large target speed
+      it.printf(64, 15, id(font_speed), Color::WHITE, TextAlign::TOP_CENTER, "%.0f", spd);
+      
+      // Render unit label
+      it.printf(64, 80, id(font_unit), Color::CYAN, TextAlign::TOP_CENTER, "MPH");
