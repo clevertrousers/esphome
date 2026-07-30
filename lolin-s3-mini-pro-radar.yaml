@@ -1,8 +1,10 @@
-# Board: WEMOS LOLIN S3 Mini Pro
-# Definition: definitions/boards/lolin_s3_mini_pro/manifest.yaml
 substitutions:
   node_name: lolin-s3-mini-pro-radar
   node_friendly_name: Vehicle Speed Radar
+
+# Board: WEMOS LOLIN S3 Mini Pro
+# Definition: definitions/boards/lolin_s3_mini_pro/manifest.yaml
+
 esphome:
   name: ${node_name}
   friendly_name: ${node_friendly_name}
