@@ -22,10 +22,10 @@ logger:
 
 api:
   encryption:
-    key: "yB6qAT3jQGKg6BN1K2RnnB/Q62/65ed+M5aXm6I9NLw="
-
+    key: !secret lolin_s3_mini_pro_radar2__encryption_key
 ota:
   - platform: esphome
+    password: Batmanisawesome!0
 
 wifi:
   ssid: !secret wifi_ssid
