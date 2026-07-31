@@ -192,16 +192,14 @@ font:
     id: font_unit
     size: 16
 
-# Onboard ST7789 Display Component
+# Onboard ST7789 Display Component (mipi_spi driver with ST7789V model)
 display:
-  - platform: ili9xxx
-    model: st7789v
+  - platform: mipi_spi
+    model: ST7789V
     id: onboard_display
     dimensions:
       height: 128
       width: 128
-      offset_height: 0
-      offset_width: 0
     cs_pin: GPIO35
     dc_pin: GPIO36
     reset_pin: GPIO34
@@ -209,6 +207,7 @@ display:
     transform:
       mirror_x: true
       mirror_y: true
+      swap_xy: false
     data_rate: 40MHz
     lambda: |-
       float spd = id(vehicle_speed_mph).state;
