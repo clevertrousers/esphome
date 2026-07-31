@@ -52,7 +52,7 @@ output:
     pin:
       number: GPIO33
       mode: OUTPUT
-    inverted: true # Active-low backlight drive (driving LOW enables backlight)
+    #inverted: true # Active-low backlight drive (driving LOW enables backlight)
     id: display_backlight_pin
 
   - platform: gpio
@@ -204,6 +204,9 @@ display:
     dimensions:
       height: 128
       width: 128
+    # Common ST7789 offset fixes for 128x128 sub-panels:
+    # x_offset: 0
+    # y_offset: 32
     cs_pin: GPIO35
     dc_pin: GPIO36
     reset_pin: GPIO34
@@ -212,7 +215,7 @@ display:
       mirror_x: true
       mirror_y: true
       swap_xy: false
-    data_rate: 10MHz
+    data_rate: 8MHz
     lambda: |-
       float spd = id(vehicle_speed_mph).state;
       if (std::isnan(spd)) {
