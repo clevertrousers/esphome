@@ -2,9 +2,6 @@ substitutions:
   node_name: lolin-s3-mini-pro-radar2
   node_friendly_name: Vehicle Speed Radar
 
-# Board: WEMOS LOLIN S3 Mini Pro
-# Definition: definitions/boards/lolin_s3_mini_pro/manifest.yaml
-
 esphome:
   name: ${node_name}
   friendly_name: ${node_friendly_name}
@@ -23,12 +20,13 @@ esp32:
   variant: esp32s3
   framework:
     type: esp-idf
-
-psram:
-  mode: quad
+    sdkconfig_options:
+      CONFIG_SECURE_ENABLE_TEE: "n"
+      CONFIG_ESP_TEE_ENABLE: "n"
 
 logger:
   hardware_uart: USB_SERIAL_JTAG
+  level: DEBUG
 
 api:
   encryption:
@@ -50,12 +48,16 @@ captive_portal:
 # GPIO Outputs for Power Rails & Backlight
 output:
   - platform: gpio
-    pin: GPIO33
-    inverted: true # Inverted so ON drives GPIO33 LOW to enable active-low backlight
+    pin:
+      number: GPIO33
+      mode: OUTPUT
+    inverted: true # Active-low backlight drive (driving LOW turns backlight ON)
     id: display_backlight_pin
 
   - platform: gpio
-    pin: GPIO7
+    pin:
+      number: GPIO7
+      mode: OUTPUT
     id: neopixel_power
 
 # Onboard WS2812B RGB Light Configuration
@@ -192,7 +194,7 @@ font:
     id: font_unit
     size: 16
 
-# Onboard ST7789 Display Component (mipi_spi driver with ST7789V model)
+# Onboard ST7789 Display Component
 display:
   - platform: mipi_spi
     model: ST7789V
@@ -208,7 +210,7 @@ display:
       mirror_x: true
       mirror_y: true
       swap_xy: false
-    data_rate: 40MHz
+    data_rate: 20MHz
     lambda: |-
       float spd = id(vehicle_speed_mph).state;
       if (std::isnan(spd)) {
