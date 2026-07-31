@@ -130,8 +130,8 @@ binary_sensor:
 
 # SPI Bus for onboard TFT screen
 spi:
-  clk_pin: GPIO12
-  mosi_pin: GPIO11
+  clk_pin: GPIO40
+  mosi_pin: GPIO38
 
 # Hardware UART for LD2451 (Wiring: LD2451 TX -> GPIO44, LD2451 RX -> GPIO43)
 uart:
