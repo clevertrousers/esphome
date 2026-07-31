@@ -208,4 +208,4 @@ display:
       it.printf(64, 15, id(font_speed), Color::WHITE, TextAlign::TOP_CENTER, "%.0f", spd);
       
       // Render unit label
-      it.printf(64, 80, id(font_unit), Color::CYAN, TextAlign::TOP_CENTER, "MPH");
+      it.printf(64, 80, id(font_unit), Color(0, 255, 255), TextAlign::TOP_CENTER, "MPH");
