@@ -205,8 +205,10 @@ display:
       height: 128
       width: 128
     # Common ST7789 offset fixes for 128x128 sub-panels:
-    # x_offset: 0
-    # y_offset: 32
+      offset_width: 0
+      offset_height: 32
+      pad_width: 1
+      pad_height: 1
     cs_pin: GPIO35
     dc_pin: GPIO36
     reset_pin: GPIO34
