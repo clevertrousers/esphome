@@ -6,11 +6,11 @@ esphome:
   name: ${node_name}
   friendly_name: ${node_friendly_name}
   on_boot:
-    priority: 1000.0  # Run early to stabilize power rails
+    priority: 1000.0  # Run early to initialize power rails before display & RMT
     then:
       - output.turn_on: neopixel_power
       - output.turn_on: display_backlight_pin
-      - delay: 50ms   # Allow power rail to stabilize before RMT & SPI init
+      - delay: 50ms   # Allow power rails to settle
       # Initialize sensors to 0 on startup
       - lambda: |-
           id(vehicle_speed_mph).publish_state(0.0);
@@ -52,13 +52,14 @@ output:
     pin:
       number: GPIO33
       mode: OUTPUT
-    inverted: true # Active-low backlight drive (driving LOW turns backlight ON)
+    inverted: true # Active-low backlight drive (driving LOW enables backlight)
     id: display_backlight_pin
 
   - platform: gpio
     pin:
       number: GPIO7
       mode: OUTPUT
+    inverted: true # Inverted so driving "ON" pulls GPIO7 LOW to energize NeoPixel power
     id: neopixel_power
 
 # Onboard WS2812B RGB Light Configuration
