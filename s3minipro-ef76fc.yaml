@@ -8,31 +8,42 @@ substitutions:
 esphome:
   name: ${node_name}
   friendly_name: ${node_friendly_name}
+  on_boot:
+    priority: 800
+    then:
+      - output.turn_on: neopixel_power
+      - output.turn_on: display_backlight_pin
+      # Initialize sensors to 0 on startup
+      - lambda: |-
+          id(vehicle_speed_mph).publish_state(0.0);
+          id(vehicle_distance).publish_state(0.0);
 
 esp32:
   board: esp32-s3-devkitc-1
   variant: esp32s3
   framework:
     type: esp-idf
-  
+
 psram:
   mode: quad
-    
+
 logger:
+  hardware_uart: USB_SERIAL_JTAG
 
 api:
   encryption:
     key: !secret lolin_s3_mini_pro_radar2__encryption_key
+
 ota:
   - platform: esphome
-    password: Batmanisawesome!0
+    password: !secret lolin_s3_mini_pro_radar2__ota_password
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   ap:
     ssid: lolin-s3-mini-p Fallback Hotspot
-    password: "sfzD4RJfxfwh"
+    password: !secret lolin_s3_mini_pro_radar2__ap_password
 
 captive_portal:
 
@@ -40,7 +51,8 @@ captive_portal:
 output:
   - platform: gpio
     pin: GPIO33
-    id: display_backlight
+    inverted: true # Inverted so ON drives GPIO33 LOW to enable active-low backlight
+    id: display_backlight_pin
 
   - platform: gpio
     pin: GPIO7
@@ -56,7 +68,7 @@ light:
     id: onboard_rgb
     name: "Onboard RGB Light"
 
-# Onboard Hardware Buttons (RGB matches button border ring)
+# Onboard Hardware Buttons
 binary_sensor:
   - platform: gpio
     pin:
@@ -188,8 +200,8 @@ display:
     dimensions:
       height: 128
       width: 128
-      offset_height: 1
-      offset_width: 2
+      offset_height: 0
+      offset_width: 0
     cs_pin: GPIO35
     dc_pin: GPIO36
     reset_pin: GPIO34
