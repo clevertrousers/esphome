@@ -1,282 +1,208 @@
 substitutions:
-  friendly_name: 'S3 Mini Pro'
-  node_name: 's3minipro-ef76fc'
-  device_name: 's3minipro'
-  project_base: 'Lolin Wemos'
-  project_name: 'S3 Mini Pro'
-  project_version: '1.0'
-  device_description: 'I2C(SH1.0-4P); 0.85"TFT(128x128); QMI8658C(6D MEMS IMU)'
-# pins
-  pin_button_1: '0'
-  pin_button_2: '47'
-  pin_button_3: '48'
-  pin_ir: '9'
-  pin_rgb_led: '8'
-  pin_rgb_power: '7'
-  pin_i2c_sda: '12'
-  pin_i2c_scl: '11'
-  imu_int_1: '18'
-  imu_int_2: '21'
-  pin_tx: '43'
-  pin_rx: '44'
-  pin_ss: '37'
-  pin_tft_bl: '33'
-  pin_tft_rst: '34'
-  pin_tft_cs: '35'
-  pin_tft_dc: '36'
-  pin_tft_mosi: '38'
-  pin_tft_miso: '39'
-  pin_tft_sck: '40'
+  node_name: lolin-s3-mini-pro-radar2
+  node_friendly_name: Vehicle Speed Radar
+
+# Board: WEMOS LOLIN S3 Mini Pro
+# Definition: definitions/boards/lolin_s3_mini_pro/manifest.yaml
 
 esphome:
   name: ${node_name}
-  friendly_name: ${friendly_name}
-  platformio_options:
-    board_build.flash_mode: dio
+  friendly_name: ${node_friendly_name}
 
 esp32:
   board: esp32-s3-devkitc-1
-  # board: lolin_s3_mini
   variant: esp32s3
   framework:
-    type: arduino
-    # type: esp-idf
-    # version: 5.2.1
-    # platform_version: 6.8.1
-
+    type: esp-idf
+    
 logger:
 
-# API is a requirement of the dashboard import.
 api:
   encryption:
-    key: "KS3lnGhzkzSf9usDk9RAIO06IvtJ9x/CwmSvdTvV80s="
-    
-# OTA is required for Over-the-Air updating
+    key: "yB6qAT3jQGKg6BN1K2RnnB/Q62/65ed+M5aXm6I9NLw="
+
 ota:
   - platform: esphome
-    password: "4c29348dac8a087c4cb1d6bfdc4ab735"
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Esp32-S3-Mini-Pro"
-    password: "MomhKyW5HWgF"
+    ssid: lolin-s3-mini-p Fallback Hotspot
+    password: "sfzD4RJfxfwh"
 
-# Buttons
+captive_portal:
+
+# GPIO Outputs for Power Rails & Backlight
+output:
+  - platform: gpio
+    pin: GPIO33
+    id: display_backlight
+
+  - platform: gpio
+    pin: GPIO7
+    id: neopixel_power
+
+# Onboard WS2812B RGB Light Configuration
+light:
+  - platform: esp32_rmt_led_strip
+    pin: GPIO8
+    num_leds: 1
+    chipset: ws2812
+    rgb_order: GRB
+    id: onboard_rgb
+    name: "Onboard RGB Light"
+
+# Onboard Hardware Buttons (RGB matches button border ring)
 binary_sensor:
-- platform: gpio
-  pin:
-    number: $pin_button_1
-    inverted: true
-    mode:
-      input: true
-      pullup: true
-    ignore_strapping_warning: true
-  name: Button Left
-  id: io_${pin_button_1}
-  on_press:
-      then:
-         - light.turn_on:
-            id: ${device_name}_leds              
-            red: 0
-            green: 0
-            blue: 1
-            brightness: 50%
-  on_release:
-      then:
-         - light.turn_off:
-            id: ${device_name}_leds              
-
-- platform: gpio
-  pin:
-    number: $pin_button_2
-    inverted: true
-    mode:
-      input: true
-      pullup: true
-  name: Button OK
-  id: io_${pin_button_2}
-  on_press:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Left Button"
+    on_press:
       then:
         - light.turn_on:
-            id: ${device_name}_leds              
-            red: 1
-            green: 0
-            blue: 0       
-            brightness: 50%
-        #- lambda: 'id(lcd).update();'
-
-  on_release:
+            id: onboard_rgb
+            brightness: 100%
+            red: 100%
+            green: 0%
+            blue: 0%
+    on_release:
       then:
-         - light.turn_off:
-            id: ${device_name}_leds              
+        - light.turn_off: onboard_rgb
 
-- platform: gpio
-  pin:
-    number: $pin_button_3
-    inverted: true
-    mode:
-      input: true
-      pullup: true
-  name: Button Right
-  id: io_${pin_button_3}
-  on_press:
+  - platform: gpio
+    pin:
+      number: GPIO47
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Center Button"
+    on_press:
       then:
-         - light.turn_on:
-            id: ${device_name}_leds              
-            red: 0
-            green: 1
-            blue: 0       
-            brightness: 25%
-  on_release:
+        - light.turn_on:
+            id: onboard_rgb
+            brightness: 100%
+            red: 0%
+            green: 100%
+            blue: 0%
+    on_release:
       then:
-         - light.turn_off:
-            id: ${device_name}_leds              
+        - light.turn_off: onboard_rgb
 
-sensor:
-  - platform: homeassistant
-    name: "Current Temperature"
-    entity_id: "sensor.kpsm_temperature"
-    id: current_temperature
+  - platform: gpio
+    pin:
+      number: GPIO48
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Right Button"
+    on_press:
+      then:
+        - light.turn_on:
+            id: onboard_rgb
+            brightness: 100%
+            red: 0%
+            green: 0%
+            blue: 100%
+    on_release:
+      then:
+        - light.turn_off: onboard_rgb
 
-i2c:
-  id: i2c_bus
-  sda: $pin_i2c_sda
-  scl: $pin_i2c_scl
-  scan: true
-
+# SPI Bus for onboard TFT screen
 spi:
-  clk_pin: $pin_tft_sck
-  mosi_pin: $pin_tft_mosi
-  interface: any
+  clk_pin: GPIO12
+  mosi_pin: GPIO11
 
-image:
-  - file: "images/smiley.jpg"
-    id: smiley1
-    resize: 128x128
-    type: RGB
+# Hardware UART for LD2451 (Wiring: LD2451 TX -> GPIO44, LD2451 RX -> GPIO43)
+uart:
+  - id: ld2451_uart
+    tx_pin: GPIO43
+    rx_pin: GPIO44
+    baud_rate: 115200
 
-# Define a font
+# Template Sensors for Radar Data
+sensor:
+  - platform: template
+    name: "Vehicle Speed (mph)"
+    id: vehicle_speed_mph
+    unit_of_measurement: "mph"
+    accuracy_decimals: 0
+    icon: "mdi:speedometer"
+
+  - platform: template
+    name: "Vehicle Distance"
+    id: vehicle_distance
+    unit_of_measurement: "m"
+    accuracy_decimals: 1
+    icon: "mdi:ruler"
+
+# LD2451 UART Frame Parser
+interval:
+  - interval: 100ms
+    then:
+      - lambda: |-
+          while (id(ld2451_uart).available() >= 16) {
+            uint8_t header[4];
+            id(ld2451_uart).read_array(header, 4);
+
+            // Match LD2451 frame header (0xAA 0xFF)
+            if (header[0] == 0xAA && header[1] == 0xFF) {
+              uint8_t buffer[12];
+              id(ld2451_uart).read_array(buffer, 12);
+
+              int16_t raw_speed = (int16_t)(buffer[6] | (buffer[7] << 8));
+              uint16_t raw_distance = (uint16_t)(buffer[4] | (buffer[5] << 8));
+
+              // Convert m/s raw output to mph (1 m/s = ~2.23694 mph)
+              float speed_ms = abs(raw_speed) / 10.0f;
+              float speed_mph = speed_ms * 2.23694f;
+              float distance_m = raw_distance / 100.0f;
+
+              if (speed_mph >= 1.0f) {
+                id(vehicle_speed_mph).publish_state(speed_mph);
+                id(vehicle_distance).publish_state(distance_m);
+              } else {
+                id(vehicle_speed_mph).publish_state(0.0f);
+              }
+            }
+          }
+
+# Font Definitions for 128x128 screen
 font:
-  - file: "fonts/Roboto-Regular.ttf"
-    id: my_font
-    size: 40
+  - file: "gfonts://Roboto"
+    id: font_speed
+    size: 44
+  - file: "gfonts://Roboto"
+    id: font_unit
+    size: 16
 
+# Onboard ST7789 Display Component
 display:
-    platform: ili9xxx
-    id: lcd
-    cs_pin: $pin_tft_cs
-    dc_pin: $pin_tft_dc
-    reset_pin: $pin_tft_rst
-    auto_clear_enabled: true
-    model: GC9A01A
+  - platform: ili9xxx
+    model: st7789v
+    id: onboard_display
     dimensions:
       height: 128
       width: 128
       offset_height: 1
       offset_width: 2
-    data_rate: 20MHz
-    color_order: bgr
+    cs_pin: GPIO35
+    dc_pin: GPIO36
+    reset_pin: GPIO34
     invert_colors: true
     transform:
       mirror_x: true
       mirror_y: true
-#    lambda: |-
-#      if (id(io_${pin_button_2}).state) {
-#        it.print(0, 0, id(my_font), "Button Pressed!");
-#      } else {
-#        it.print(0, 0, id(my_font), "Press Button");
-#      }
+    data_rate: 40MHz
     lambda: |-
-      it.strftime(0, 0, id(my_font), "%H:%M", id(${device_name}_time).now());
-      it.printf(0, 64, id(my_font), "%.1f°F", id(current_temperature).state);
-
-remote_receiver:
-- id: ${device_name}_receiver
-  dump: all
-  pin:
-    number: $pin_ir
-    mode:
-      input: true
-
-time:
-  - platform: sntp
-    id: ${device_name}_time
-
-power_supply:
-- id: rgb_led_psu
-  pin:
-    number: $pin_rgb_power
-    mode:
-      output: true
-      pulldown: true
-  enable_time: 10ms
-  keep_on_time: 50ms
-  enable_on_boot: false
-
-output:
-  - id: backlight_pwm
-    platform: ledc
-    frequency: 1220Hz
-    pin:
-      number: $pin_tft_bl
-      mode:
-        output: true
-        pullup: true
-    min_power: 0.1
-    max_power: 0.99
-    zero_means_zero: true
-
-light:
-  - platform: monochromatic
-    output: backlight_pwm
-    name: Display
-    id: backlight
-    restore_mode: ALWAYS_ON
-    icon: mdi:cellphone-screenshot
-    entity_category: config
-    default_transition_length: 100ms
-    on_turn_on:
-      then:
-        - component.update: lcd
-    on_turn_off:
-      then:
-        - lambda: |-
-            id(${device_name}_leds).turn_on().set_brightness(0.2).set_rgb(1.0, 0.5, 0.0).perform();
-
-  - platform: esp32_rmt_led_strip
-    chipset: WS2812
-    rgb_order: RGB
-    pin: $pin_rgb_led
-    num_leds: 1
-    icon: mdi:developer-board
-    id: ${device_name}_leds
-    name: IO_${pin_rgb_led}_LED
-    entity_category: diagnostic
-    disabled_by_default: true
-    restore_mode: ALWAYS_OFF
-    default_transition_length: 200ms
-    power_supply: rgb_led_psu
-#    effects: !include
-#      file: common/light/effects/single.rgb.yaml
-
-# Update the display periodically
-#interval:
-#  - interval: 1s
-#    then:
-#      - display.page.show_next: lcd
-
-####
-# packages:
-#   gyro: !include {
-#     file: common/sensor/qmi8658c.yaml,
-#     vars: {
-#       gyro_id: '${gyro_id}',
-#       gyro_name: '${gyro_name}',
-#       update_interval: '${gyro_update_interval}',
-#     }
-#   }
-####
+      float spd = id(vehicle_speed_mph).state;
+      if (std::isnan(spd)) {
+        spd = 0.0f;
+      }
+      
+      // Render large target speed
+      it.printf(64, 15, id(font_speed), Color::WHITE, TextAlign::TOP_CENTER, "%.0f", spd);
+      
+      // Render unit label
+      it.printf(64, 80, id(font_unit), Color::CYAN, TextAlign::TOP_CENTER, "MPH");
