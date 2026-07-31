@@ -9,7 +9,7 @@ esphome:
     priority: 1000.0  # Run early to initialize power rails before display & RMT
     then:
       - output.turn_on: neopixel_power
-      - output.turn_on: display_backlight_pin
+      - output.turn_off: display_backlight_pin
       - delay: 50ms   # Allow power rails to settle
       # Initialize sensors to 0 on startup
       - lambda: |-
