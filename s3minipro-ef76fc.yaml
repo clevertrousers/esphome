@@ -6,10 +6,11 @@ esphome:
   name: ${node_name}
   friendly_name: ${node_friendly_name}
   on_boot:
-    priority: 800
+    priority: 1000.0  # Run early to stabilize power rails
     then:
       - output.turn_on: neopixel_power
       - output.turn_on: display_backlight_pin
+      - delay: 50ms   # Allow power rail to stabilize before RMT & SPI init
       # Initialize sensors to 0 on startup
       - lambda: |-
           id(vehicle_speed_mph).publish_state(0.0);
@@ -210,7 +211,7 @@ display:
       mirror_x: true
       mirror_y: true
       swap_xy: false
-    data_rate: 20MHz
+    data_rate: 10MHz
     lambda: |-
       float spd = id(vehicle_speed_mph).state;
       if (std::isnan(spd)) {
