@@ -22,3 +22,71 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
+  
+uart:
+  - id: uart_ld2412
+    tx_pin: GPIO4
+    rx_pin: GPIO3
+    baud_rate: 115200
+    parity: NONE
+    stop_bits: 1
+
+# Base Hub Component
+ld2412:
+  id: my_ld2412
+  uart_id: uart_ld2412
+
+# Binary Sensors (State Detection)
+binary_sensor:
+  - platform: ld2412
+    has_target:
+      name: "Presence Detected"
+    has_moving_target:
+      name: "Moving Target Detected"
+    has_still_target:
+      name: "Still Target Detected"
+
+# Core Telemetry Sensors
+sensor:
+  - platform: ld2412
+    moving_distance:
+      name: "Moving Target Distance"
+      unit_of_measurement: "cm"
+    still_distance:
+      name: "Still Target Distance"
+      unit_of_measurement: "cm"
+    detection_distance:
+      name: "Target Distance"
+      unit_of_measurement: "cm"
+    moving_energy:
+      name: "Moving Target Energy"
+    still_energy:
+      name: "Still Target Energy"
+    light:
+      name: "Light Level"
+
+# Control Switches
+switch:
+  - platform: ld2412
+    engineering_mode:
+      name: "Engineering Mode"
+    bluetooth:
+      name: "LD2412 Bluetooth"
+
+# Dynamic Configuration Options
+number:
+  - platform: ld2412
+    timeout:
+      name: "Presence Timeout"
+    min_distance_gate:
+      name: "Min Detection Gate"
+    max_distance_gate:
+      name: "Max Detection Gate"
+
+# Utility Commands
+button:
+  - platform: ld2412
+    restart:
+      name: "Restart LD2412"
+    factory_reset:
+      name: "Factory Reset LD2412"
