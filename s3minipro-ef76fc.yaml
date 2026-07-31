@@ -205,7 +205,7 @@ display:
       height: 128
       width: 128
     # Common ST7789 offset fixes for 128x128 sub-panels:
-      offset_width: 1
+      offset_width: 2
       offset_height: 1
       pad_width: 0
       pad_height: 0
