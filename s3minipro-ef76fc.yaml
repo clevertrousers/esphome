@@ -52,7 +52,7 @@ output:
     pin:
       number: GPIO33
       mode: OUTPUT
-    #inverted: true # Active-low backlight drive (driving LOW enables backlight)
+    inverted: true # Active-low backlight drive (driving LOW enables backlight)
     id: display_backlight_pin
 
   - platform: gpio
