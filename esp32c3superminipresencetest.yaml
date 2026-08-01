@@ -38,6 +38,7 @@ uart:
     baud_rate: 115200
     parity: NONE
     stop_bits: 1
+    rx_buffer_size: 512  # Increases buffer size so bursts don't truncate frames
 
 # Base Hub Component
 ld2412:
