@@ -9,9 +9,9 @@ esp32:
   variant: esp32c3
 
 logger:
-  level: VERY_VERBOSE
+  level: INFO
   logs:
-    ld2412: VERY_VERBOSE
+    ld2412: ERROR  # Suppresses non-fatal command queue parsing warnings
   
 api:
   encryption:
