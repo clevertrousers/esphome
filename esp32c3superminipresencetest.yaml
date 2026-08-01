@@ -9,7 +9,10 @@ esp32:
   variant: esp32c3
 
 logger:
-
+  level: VERY_VERBOSE
+  logs:
+    ld2412: VERY_VERBOSE
+  
 api:
   encryption:
     key: "IA8pmfF3Xui4b0LtWNxUzB9sQ4+wQXveF9IHmb9+QtY="
