@@ -22,7 +22,11 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  
+  power_save_mode: NONE
+  output_power: 8.5dBm
+  ap:
+    ssid: esp32c3supermin Fallback Hotspot
+    password: uKVD7vjiRAI2
 uart:
   - id: uart_ld2412
     tx_pin: GPIO4
