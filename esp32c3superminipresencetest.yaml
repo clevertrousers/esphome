@@ -34,12 +34,18 @@ wifi:
 captive_portal:
 
  # Hardware UART mapping: GPIO4 = TX, GPIO3 = RX
+# Hardware UART mapping with expanded ring buffer
+
 uart:
   - id: uart_ld2412
     tx_pin: GPIO4
     rx_pin: GPIO3
     baud_rate: 115200
-    rx_buffer_size: 512
+    parity: NONE
+    stop_bits: 1
+    # Expands the hardware RX buffer from default (256 bytes) to 1024 bytes.
+    # Prevents dropped or truncated frame headers during network tasks.
+    rx_buffer_size: 1024
 
 # Base Hub Component
 ld2412:
