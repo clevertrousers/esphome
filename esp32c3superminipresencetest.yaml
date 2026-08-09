@@ -55,7 +55,7 @@ binary_sensor:
       name: "Still Target Detected"
 
 # Core Telemetry Sensors
-sensor:
+sensor: 
   - platform: ld2412
     moving_distance:
       name: "Moving Target Distance"
