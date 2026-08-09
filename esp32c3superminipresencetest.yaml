@@ -1,18 +1,16 @@
-# Board: Nologo ESP32C3 SuperMini
-# Definition: definitions/boards/nologo_esp32c3_super_mini/manifest.yaml
-
 esphome:
   name: esp32c3superminipresencetest
   friendly_name: esp32c3superminipresencetest
 
 esp32:
+  board: esp32-c3-devkitm-1
   variant: esp32c3
 
 logger:
   level: INFO
   logs:
     ld2412: ERROR  # Suppresses non-fatal command queue parsing warnings
-  
+
 api:
   encryption:
     key: "IA8pmfF3Xui4b0LtWNxUzB9sQ4+wQXveF9IHmb9+QtY="
@@ -20,12 +18,10 @@ api:
 ota:
   - platform: esphome
 
-
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   power_save_mode: NONE
-  #fast_connect: true
   output_power: 8.5dBm
   ap:
     ssid: esp32c3supermin Fallback Hotspot
@@ -33,9 +29,7 @@ wifi:
 
 captive_portal:
 
- # Hardware UART mapping: GPIO4 = TX, GPIO3 = RX
-# Hardware UART mapping with expanded ring buffer
-
+# Hardware UART mapping: GPIO4 = TX, GPIO3 = RX
 uart:
   - id: uart_ld2412
     tx_pin: GPIO4
@@ -43,8 +37,6 @@ uart:
     baud_rate: 115200
     parity: NONE
     stop_bits: 1
-    # Expands the hardware RX buffer from default (256 bytes) to 1024 bytes.
-    # Prevents dropped or truncated frame headers during network tasks.
     rx_buffer_size: 1024
 
 # Base Hub Component
@@ -88,15 +80,13 @@ switch:
       name: "Engineering Mode"
     bluetooth:
       name: "LD2412 Bluetooth"
-
-      # Onboard LED Switch (GPIO8, Active-Low)
   - platform: gpio
     pin:
       number: GPIO8
       inverted: true
     name: "Onboard LED"
     id: onboard_led
-    
+
 # Dynamic Configuration Options
 number:
   - platform: ld2412
