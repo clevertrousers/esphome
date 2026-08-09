@@ -89,6 +89,14 @@ switch:
     bluetooth:
       name: "LD2412 Bluetooth"
 
+      # Onboard LED Switch (GPIO8, Active-Low)
+  - platform: gpio
+    pin:
+      number: GPIO8
+      inverted: true
+    name: "Onboard LED"
+    id: onboard_led
+    
 # Dynamic Configuration Options
 number:
   - platform: ld2412
