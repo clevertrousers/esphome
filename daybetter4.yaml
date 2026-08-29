@@ -29,35 +29,39 @@ captive_portal:
 web_server:
   port: 80
 
-# 1. Define the BP5758D chip hub on Pins 7 & 8
+# Swapped pins for BP5758D
 bp5758d:
-  data_pin: P8
-  clock_pin: P7
+  data_pin: P7
+  clock_pin: P8
 
-# 2. Map the outputs to the BP5758D channels (1 through 5)
 output:
+  # Power gate pin
+  - platform: gpio
+    pin: P26
+    id: power_mosfet
+
+  # BP5758D Channels
   - platform: bp5758d
     id: output_red
     channel: 1
-    current: 12
+    current: 20
   - platform: bp5758d
     id: output_green
     channel: 2
-    current: 12
+    current: 20
   - platform: bp5758d
     id: output_blue
     channel: 3
-    current: 12
+    current: 20
   - platform: bp5758d
     id: output_white
     channel: 4
-    current: 12
+    current: 20
   - platform: bp5758d
     id: output_warm_white
     channel: 5
-    current: 12
+    current: 20
 
-# 3. Create the light entity referencing those outputs
 light:
   - platform: rgbww
     name: "daybetter4Light"
