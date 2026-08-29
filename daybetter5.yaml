@@ -25,3 +25,49 @@ wifi:
     password: "y7jTR6IyhjsV"
 
 captive_portal:
+
+  # BP5758D LED Driver Chip Configuration (SDA: P7, SCL: P8)
+bp5758d:
+  data_pin: P7
+  clock_pin: P8
+
+output:
+  # N-Channel MOSFET Power Enable Pin
+  - platform: gpio
+    pin: P26
+    id: power_mosfet
+
+  # BP5758D Driver Channel Outputs (Current set to 20mA)
+  - platform: bp5758d
+    id: output_red
+    channel: 3
+    current: 20
+  - platform: bp5758d
+    id: output_green
+    channel: 2
+    current: 20
+  - platform: bp5758d
+    id: output_blue
+    channel: 1
+    current: 20
+  - platform: bp5758d
+    id: output_white
+    channel: 4
+    current: 20
+  - platform: bp5758d
+    id: output_warm_white
+    channel: 5
+    current: 20
+
+# RGBWW Light Entity Configuration
+light:
+  - platform: rgbww
+    name: "daybetter5Light"
+    id: daybetter5_light
+    red: output_red
+    green: output_green
+    blue: output_blue
+    cold_white: output_white
+    warm_white: output_warm_white
+    cold_white_color_temperature: 6500K
+    warm_white_color_temperature: 2700K
