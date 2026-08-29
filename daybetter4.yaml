@@ -40,18 +40,18 @@ output:
     pin: P26
     id: power_mosfet
 
-  # BP5758D Channels
+# Swapped Red and Blue channels
   - platform: bp5758d
     id: output_red
-    channel: 1
+    channel: 3   # Was 1
     current: 20
   - platform: bp5758d
     id: output_green
-    channel: 2
+    channel: 2   # Kept at 2
     current: 20
   - platform: bp5758d
     id: output_blue
-    channel: 3
+    channel: 1   # Was 3
     current: 20
   - platform: bp5758d
     id: output_white
