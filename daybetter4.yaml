@@ -25,3 +25,34 @@ wifi:
     password: "JOB7GxhDwqYq"
 
 captive_portal:
+
+web_server:
+  port: 80
+
+output:
+  - platform: libretiny_pwm
+    id: output_red
+    pin: P6
+  - platform: libretiny_pwm
+    id: output_green
+    pin: P7
+  - platform: libretiny_pwm
+    id: output_blue
+    pin: P8
+  - platform: libretiny_pwm
+    id: output_cold_white
+    pin: P9
+  - platform: libretiny_pwm
+    id: output_warm_white
+    pin: P26
+
+light:
+  - platform: rgbww
+    name: "daybetter4Light"
+    red: output_red
+    green: output_green
+    blue: output_blue
+    cold_white: output_cold_white
+    warm_white: output_warm_white
+    cold_white_color_temperature: 6500K
+    warm_white_color_temperature: 2700K
