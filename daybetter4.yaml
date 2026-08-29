@@ -32,19 +32,19 @@ web_server:
 output:
   - platform: libretiny_pwm
     id: output_red
-    pin: P6
+    pin: P24
   - platform: libretiny_pwm
     id: output_green
-    pin: P7
+    pin: P26
   - platform: libretiny_pwm
     id: output_blue
-    pin: P8
+    pin: P6
   - platform: libretiny_pwm
     id: output_cold_white
-    pin: P9
+    pin: P7
   - platform: libretiny_pwm
     id: output_warm_white
-    pin: P26
+    pin: P8
 
 light:
   - platform: rgbww
