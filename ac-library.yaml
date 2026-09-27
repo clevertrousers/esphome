@@ -23,7 +23,7 @@ logger:
 
 api:
   encryption:
-    key: !secret ac_library__encryption_key
+    key: !secret ac_encryption_key
 
 captive_portal:
 
